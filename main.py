@@ -15,57 +15,77 @@ class PizzaPalApp:
         # Create labels
         self.create_labels()
 
+        # Create selection menu
+        self.create_selection_menu()
+
         # Create buttons
         self.create_buttons()
 
     def load_image(self):
         # Load the pizza image
         try:
-            self.pizza_image = Image.open("images/pizza_image.png")  # Ensure the image path is correct
+            self.pizza_image = Image.open("pizza_image.png")  # Ensure the image path is correct
             self.pizza_image = self.pizza_image.resize((200, 150), Image.ANTIALIAS)  # Resize the image
             self.pizza_photo = ImageTk.PhotoImage(self.pizza_image)
 
             # Display the image in a label
             self.image_label = tk.Label(self.root, image=self.pizza_photo)
             self.image_label.pack(pady=10)
-        except FileNotFoundError:
-            messagebox.showerror("Error", "Pizza image not found! Please check the file path.")
+        except Exception as e:
+            messagebox.showerror("Image Error", f"Could not load image: {e}")
 
     def create_labels(self):
-        # Welcome label
-        self.welcome_label = tk.Label(self.root, text="Welcome to PizzaPal!", font=("Arial", 16))
-        self.welcome_label.pack(pady=10)
+        # Title label
+        self.title_label = tk.Label(self.root, text="Select Your Pizza", font=("Arial", 14))
+        self.title_label.pack()
 
-        # Pizza size label
-        self.size_label = tk.Label(self.root, text="Select Your Pizza Size:", font=("Arial", 12))
-        self.size_label.pack()
+    def create_selection_menu(self):
+        # Pizza selection
+        self.pizza_options = ["Margherita", "Pepperoni", "BBQ Chicken", "Veggie"]
+        self.pizza_var = tk.StringVar()
+        self.pizza_var.set("Select Pizza")
+        self.pizza_menu = tk.OptionMenu(self.root, self.pizza_var, *self.pizza_options)
+        self.pizza_menu.pack(pady=5)
 
-        # Toppings label
-        self.toppings_label = tk.Label(self.root, text="Choose Your Toppings:", font=("Arial", 12))
-        self.toppings_label.pack()
+        # Size selection
+        self.size_options = ["Small", "Medium", "Large"]
+        self.size_var = tk.StringVar()
+        self.size_var.set("Select Size")
+        self.size_menu = tk.OptionMenu(self.root, self.size_var, *self.size_options)
+        self.size_menu.pack(pady=5)
 
     def create_buttons(self):
-        # Add to Cart button
-        self.add_to_cart_button = tk.Button(self.root, text="Add to Cart", command=self.add_to_cart)
-        self.add_to_cart_button.pack(pady=10)
+        # Order button
+        self.order_button = tk.Button(self.root, text="Submit Order", command=self.submit_order)
+        self.order_button.pack(pady=10)
 
-        # View Cart button
-        self.view_cart_button = tk.Button(self.root, text="View Cart", command=self.view_cart)
-        self.view_cart_button.pack(pady=10)
+        # Reset button
+        self.reset_button = tk.Button(self.root, text="Reset Selections", command=self.reset_selections)
+        self.reset_button.pack()
 
         # Exit button
-        self.exit_button = tk.Button(self.root, text="Exit", command=self.root.quit)
+        self.exit_button = tk.Button(self.root, text="Exit", command=self.confirm_exit)
         self.exit_button.pack(pady=10)
 
-    def add_to_cart(self):
-        # Placeholder function for adding items to the cart
-        messagebox.showinfo("Add to Cart", "Your pizza has been added to the cart!")
+    def submit_order(self):
+        pizza_choice = self.pizza_var.get()
+        size_choice = self.size_var.get()
 
-    def view_cart(self):
-        # Placeholder function for viewing the cart
-        messagebox.showinfo("View Cart", "This will open the order summary window.")
+        if pizza_choice == "Select Pizza" or size_choice == "Select Size":
+            messagebox.showerror("Input Error", "Please select a pizza and size before ordering.")
+            return
 
-# Main function to run the application
+        order_summary = f"You ordered a {size_choice} {pizza_choice} pizza."
+        messagebox.showinfo("Order Summary", order_summary)
+
+    def reset_selections(self):
+        self.pizza_var.set("Select Pizza")
+        self.size_var.set("Select Size")
+
+    def confirm_exit(self):
+        if messagebox.askyesno("Exit", "Are you sure you want to exit?"):
+            self.root.destroy()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = PizzaPalApp(root)
